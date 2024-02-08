@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="ASSets\Grass.png" />
+    <None Remove="ASSets\Mountain-Dusk.png" />
+    <None Remove="ASSets\Player1.png" />
+    <None Remove="ASSets\Player2.png" />
+    <None Remove="ASSets\Water.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="ASSets\Player1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\StrategyLib\Strategy.Domain\Strategy.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="ASSets\Grass.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="ASSets\Mountain-Dusk.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="ASSets\Player2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="ASSets\Water.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+</Project>

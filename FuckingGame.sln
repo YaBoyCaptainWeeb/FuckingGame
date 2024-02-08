@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuckingGame", "FuckingGame\FuckingGame.csproj", "{D5DBD2EB-AEFC-4106-85E2-8CBE94021495}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Strategy.Domain", "..\StrategyLib\Strategy.Domain\Strategy.Domain.csproj", "{D971ADB5-5006-4805-8BCE-8D3BFB203D14}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D5DBD2EB-AEFC-4106-85E2-8CBE94021495}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5DBD2EB-AEFC-4106-85E2-8CBE94021495}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5DBD2EB-AEFC-4106-85E2-8CBE94021495}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5DBD2EB-AEFC-4106-85E2-8CBE94021495}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D971ADB5-5006-4805-8BCE-8D3BFB203D14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D971ADB5-5006-4805-8BCE-8D3BFB203D14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D971ADB5-5006-4805-8BCE-8D3BFB203D14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D971ADB5-5006-4805-8BCE-8D3BFB203D14}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {29F207B7-C732-41C5-AF76-F0314535DD70}
+	EndGlobalSection
+EndGlobal
