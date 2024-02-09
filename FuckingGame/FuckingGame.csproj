@@ -10,9 +10,12 @@
 
   <ItemGroup>
     <None Remove="ASSets\Grass.png" />
+    <None Remove="ASSets\knight_image.png" />
     <None Remove="ASSets\Mountain-Dusk.png" />
     <None Remove="ASSets\Player1.png" />
     <None Remove="ASSets\Player2.png" />
+    <None Remove="ASSets\Swordsman.png" />
+    <None Remove="ASSets\Swordsman_enemy.png" />
     <None Remove="ASSets\Water.png" />
   </ItemGroup>
 
@@ -34,6 +37,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="ASSets\Player2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="ASSets\Swordsman.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="ASSets\Swordsman_enemy.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="ASSets\Water.png">

@@ -5,7 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FuckingGame"
         mc:Ignorable="d"
-        Title="Fucking Game" x:Name="GameWindow" Height="700" Width="1200">
+        Title="Fucking Game" x:Name="GameWindow" SizeToContent="Height" Height="800" Width="1200">
+    <Window.Background>
+        <ImageBrush ImageSource="ASSets/Mountain-Dusk.png"/>
+    </Window.Background>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
@@ -17,16 +20,27 @@
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <Grid.Background>
-            <ImageBrush ImageSource="ASSets/Mountain-Dusk.png"/>
+            <SolidColorBrush Color="Black" Opacity="0.5"/>
         </Grid.Background>
-        <Viewbox x:Name="BoxMap" Grid.Row="1" Grid.Column="1">
-            <Canvas x:Name="CanvasMap" OpacityMask="Black" Loaded="Map_Loaded"  />
-        </Viewbox>
-        
-        
-        <StackPanel Grid.Row="1" Grid.Column="0"> 
-            <Image x:Name="img1" Source="{Binding Path=Portrait}"/>
+        <StackPanel Grid.Row="1" Grid.Column="1">
+            <Viewbox x:Name="BoxMap">
+                <Canvas x:Name="CanvasMap" OpacityMask="Black" Loaded="Map_Loaded"/>
+            </Viewbox>
         </StackPanel>
 
+
+
+        <WrapPanel Grid.Row="1" Grid.Column="0" x:Name="Player1Panel" Width="150" Height="auto">
+            <Image Width="100" Height="100" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="25 20 0 0" Source="{Binding player1.Portrait}"/>
+            <TextBlock Text="{Binding player1.Name}" HorizontalAlignment="Center" Foreground="White" Margin="55 0 0 0" FontWeight="SemiBold" FontSize="16"/>
+            <TextBlock Text="Статус хода: " HorizontalAlignment="Center" Foreground="White" Margin="25 0 0 0" FontWeight="SemiBold" FontSize="16"/>
+            <TextBlock Text="{Binding player1.Status}" HorizontalAlignment="Center" Foreground="White" Margin="55 0 0 0" FontWeight="SemiBold" FontSize="16"/>
+        </WrapPanel>
+        <WrapPanel Grid.Row="1" Grid.Column="2" x:Name="Player2Panel" Width="150" Height="auto">
+            <Image Width="100" Height="100" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="25 20 0 0" Source="{Binding player2.Portrait}"/>
+            <TextBlock Text="{Binding player2.Name}" HorizontalAlignment="Center" Foreground="White" Margin="55 0 0 0" FontWeight="SemiBold" FontSize="16"/>
+            <TextBlock Text="Статус хода: " HorizontalAlignment="Center" Foreground="White" Margin="25 0 0 0" FontWeight="SemiBold" FontSize="16"/>
+            <TextBlock Text="{Binding player2.Status}" HorizontalAlignment="Center" Foreground="White" Margin="55 0 0 0" FontWeight="SemiBold" FontSize="16"/>
+        </WrapPanel>
     </Grid>
 </Window>
