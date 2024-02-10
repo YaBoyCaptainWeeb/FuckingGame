@@ -83,14 +83,29 @@ namespace FuckingGame
         public List<Unit> GenerateUnits() // подумать над тем, как будут добавляться юниты
         {
             List<Unit> result = new List<Unit>();
-            result.Add(new Swordsman(1,player1, 100, 50, 3, 2,XSize,YSize));
-            result.Add(new Swordsman(2,player1, 100, 50,0,0,XSize,YSize));
-            result.Add(new Swordsman(3,player2, 50, 50, 1, 1,XSize,YSize));
-            result.Add(new Swordsman(4,player2,100,50,2,2,XSize,YSize));
+            result.Add(new Swordsman(1,player1, 100, 50, 5, 6,XSize,YSize));
+            result.Add(new Swordsman(2,player1, 100, 50,5,7,XSize,YSize));
+            result.Add(new Swordsman(3,player2, 100, 50, 15, 6,XSize,YSize));
+            result.Add(new Swordsman(4,player2,100,50,15,7,XSize,YSize));
+
+            result.Add(new Archer(5, player1, 50, 50, 6, 6, XSize, YSize));
+            result.Add(new Archer(6, player2, 50, 50,14,6,XSize,YSize));
+
+            result.Add(new Horseman(7,player1,200,75,5,5,XSize,YSize));
+            result.Add(new Horseman(8,player2,200,75,15,5,XSize,YSize));
+
+            result.Add(new Catapult(9,player1,75,100,4,6,XSize,YSize));
+            result.Add(new Catapult(10,player2,75,100,16,6,XSize,YSize));
             player1.OwnedUnits.Add(result[0]);
             player1.OwnedUnits.Add(result[1]);
+            player1.OwnedUnits.Add(result[4]);
+            player1.OwnedUnits.Add(result[6]);
             player2.OwnedUnits.Add(result[2]);
             player2.OwnedUnits.Add(result[3]);
+            player2.OwnedUnits.Add(result[5]);
+            player2.OwnedUnits.Add(result[7]);
+            player1.OwnedUnits.Add(result[8]);
+            player2.OwnedUnits.Add(result[9]);
             return result;
         }
         private void RenderMap(IReadOnlyList<Tile> map)
@@ -109,8 +124,7 @@ namespace FuckingGame
                 rect.Tag = ++RectCounter;
                 rect.Width = tile.XSize; 
                 rect.Height = tile.YSize;
-                rect.Stretch = Stretch.Uniform;
-                //rect.MouseUp += new MouseButtonEventHandler(MouseBtn);
+                rect.Stretch = Stretch.UniformToFill;
 
                 switch (tile)
                 {
@@ -139,19 +153,27 @@ namespace FuckingGame
                 }
             }
         }
-        private void RenderUnits(IReadOnlyList<Unit> units) // Возможно создам кастомный шаблон
+        private void RenderUnits(IReadOnlyList<Unit> units)
         {
             foreach (Unit unit in units)
             {
-                Image un = new Image();
-                un.Width = unit.XSize;
-                un.Height = unit.YSize;
-                un.Stretch = Stretch.Uniform;
+                UnitTemplate un = new UnitTemplate();
+                un.UnitImage.Width = unit.XSize;
+                un.UnitImage.Height = unit.YSize;
+                un.UnitImage.Stretch = Stretch.UniformToFill;
+                un.UnitHealthBar.Width = unit.XSize;
+                un.UnitHealthBar.Maximum = unit.MaxHP;
+                un.UnitHealthBar.Value = unit.hp;
                 if (unit.Player == player2 && unit.isDead == false)
                 {
-                    unit.source = new BitmapImage(new Uri("ASSets/Swordsman_enemy.png", UriKind.Relative));
-                } 
-                un.Source = unit.source;
+                    un.UnitImage.Source = unit.enemySource;
+                } else if(unit.isDead == true)
+                {
+                    un.UnitImage.Source = unit.source;
+                } else
+                {
+                    un.UnitImage.Source = unit.source;
+                }                
                 un.MouseUp += new MouseButtonEventHandler(MouseBtn1);
                 CanvasMap.Children.Add(un);
                 if (unit.isDead == true)
@@ -165,14 +187,6 @@ namespace FuckingGame
                 Canvas.SetTop(un, (unit.Y * unit.YSize));
             }
         }
-        private void MouseBtn(object sender, MouseEventArgs e)
-        {
-            Point pnt = new Point(Canvas.GetLeft(sender as FrameworkElement),Canvas.GetTop(sender as FrameworkElement));
-            int XMove = Convert.ToInt32(Math.Ceiling(pnt.X / XSize));
-            int YMove = Convert.ToInt32(Math.Ceiling(pnt.Y / YSize));
-            
-            MoveUnit(XMove, YMove);
-        }
         private void MouseBtn1(object sender, MouseEventArgs e)
         {
             Point pnt = new Point(Canvas.GetLeft(sender as FrameworkElement),Canvas.GetTop(sender as FrameworkElement));
@@ -184,8 +198,8 @@ namespace FuckingGame
 
                 CreateHighlight(savedSelectedUnit,player1,player2,(int)pnt.X, (int)pnt.Y);
                 
-                MessageBox.Show($"CellPos: {pnt.X},{pnt.Y}; UnitPos: {Math.Ceiling(pnt.X / XSize)},{Math.Ceiling(pnt.Y / YSize)}\n" +
-                $"SavedSelected unit: {savedSelectedUnit.Id},{savedSelectedUnit.GetType().Name},Who owns: {savedSelectedUnit.Player.Name}");
+                //MessageBox.Show($"CellPos: {pnt.X},{pnt.Y}; UnitPos: {Math.Ceiling(pnt.X / XSize)},{Math.Ceiling(pnt.Y / YSize)}\n" +
+                //$"SavedSelected unit: {savedSelectedUnit.Id},{savedSelectedUnit.GetType().Name},Who owns: {savedSelectedUnit.Player.Name}");
             } else if (savedSelectedUnit != null && selectedUnit == null)
             {
                 MoveUnit((int)(pnt.X / XSize), (int)(pnt.Y / YSize));
@@ -202,19 +216,22 @@ namespace FuckingGame
                 RenderUnits(controller._map.Units);
                 CreateHighlight(savedSelectedUnit, player1, player2, (int)pnt.X, (int)pnt.Y);
 
-                MessageBox.Show($"New savedSelectedUnit: {savedSelectedUnit.Id},{savedSelectedUnit.GetType().Name},Who owns: {savedSelectedUnit.Player.Name}");
+                //MessageBox.Show($"New savedSelectedUnit: {savedSelectedUnit.Id},{savedSelectedUnit.GetType().Name},Who owns: {savedSelectedUnit.Player.Name}");
             } else if (selectedUnit.Player != savedSelectedUnit.Player) 
             {
                 bool can = controller.CanAttackUnit(savedSelectedUnit, selectedUnit);
 
-                MessageBox.Show("Данного юнита можно попытаться атаковать\n"+
-                    $"Атакуемый Unit: {selectedUnit.GetType().Name}, Who owns: {selectedUnit.Player.Name}, CanAttack?: {can}, HP Before Attack: {selectedUnit.hp}");
+                //MessageBox.Show("Данного юнита можно попытаться атаковать\n"+
+                //    $"Атакуемый Unit: {selectedUnit.GetType().Name}, Who owns: {selectedUnit.Player.Name}, CanAttack?: {can}, HP Before Attack: {selectedUnit.hp}");
                 if (can)
                 {
                     controller.AttackUnit(savedSelectedUnit, selectedUnit);
-                    MessageBox.Show("Атака произошла\n" +
-                     $"Атакуемый Unit: {selectedUnit.GetType().Name}, Who owns: {selectedUnit.Player.Name}, CanAttack?: {can}, HP After Attack: {selectedUnit.hp}");                    
+                    //MessageBox.Show("Атака произошла\n" +
+                    // $"Атакуемый Unit: {selectedUnit.GetType().Name}, Who owns: {selectedUnit.Player.Name}, CanAttack?: {can}, HP After Attack: {selectedUnit.hp}");                    
                     EndTurn();
+                } else
+                {
+                    MessageBox.Show("Выбранная цель находится вне радиуса атаки вашего юнита");
                 }
             }
         }
@@ -264,7 +281,7 @@ namespace FuckingGame
             Rectangle rect = new Rectangle();
             foreach (Unit collision in player.OwnedUnits)
             {
-                if (unit.Player == player && unit != collision)
+                if (unit.Player == player && unit != collision && collision.isDead == false)
                 {
                     rect = new Rectangle()
                     {
@@ -279,7 +296,7 @@ namespace FuckingGame
                     Canvas.SetLeft(rect, collision.X * collision.XSize);
                     Canvas.SetTop(rect, collision.Y * collision.YSize);
                 }
-                else if (unit != collision)
+                else if (unit != collision && collision.isDead == false && unit.CanAttack(collision))
                 {
                     rect = new Rectangle()
                     {

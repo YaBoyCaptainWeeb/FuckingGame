@@ -28,8 +28,6 @@
             </Viewbox>
         </StackPanel>
 
-
-
         <WrapPanel Grid.Row="1" Grid.Column="0" x:Name="Player1Panel" Width="150" Height="auto">
             <Image Width="100" Height="100" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="25 20 0 0" Source="{Binding player1.Portrait}"/>
             <TextBlock Text="{Binding player1.Name, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" Foreground="White" Margin="55 0 0 0" FontWeight="SemiBold" FontSize="16"/>

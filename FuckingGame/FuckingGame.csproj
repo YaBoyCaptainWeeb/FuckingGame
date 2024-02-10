@@ -9,8 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="ASSets\Archer.png" />
+    <None Remove="ASSets\Archer_enemy.png" />
+    <None Remove="ASSets\Catapult.png" />
+    <None Remove="ASSets\Catapult_enemy.png" />
     <None Remove="ASSets\dead.png" />
     <None Remove="ASSets\Grass.png" />
+    <None Remove="ASSets\Horseman.png" />
+    <None Remove="ASSets\Horseman_enemy.png" />
     <None Remove="ASSets\knight_image.png" />
     <None Remove="ASSets\Mountain-Dusk.png" />
     <None Remove="ASSets\Player1.png" />
@@ -21,7 +27,28 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="ASSets\Catapult.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="ASSets\Archer.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="ASSets\Archer_enemy.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="ASSets\Catapult_enemy.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="ASSets\dead.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="ASSets\Horseman.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="ASSets\Horseman_enemy.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="ASSets\Player1.png">
