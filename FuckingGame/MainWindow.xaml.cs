@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml.Linq;
 using Strategy.Domain;
 using Strategy.Domain.Models;
 
@@ -23,7 +24,7 @@ namespace FuckingGame
     {
         GameController controller = null!; // контроллер
         public Player player1 = new Player(1, "Биба", new BitmapImage(new Uri("pack://application:,,,/ASSets/Player1.png")), "Ходит");
-        public Player player2 = new Player(2, "Боба", new BitmapImage(new Uri("pack://application:,,,/ASSets/Player2.png")), "Ожидает"); // Сделать ViewModel, без него никуда, походу
+        public Player player2 = new Player(2, "Боба", new BitmapImage(new Uri("pack://application:,,,/ASSets/Player2.png")), "Ожидает");
         public Player currentMove;
         public Unit selectedUnit, savedSelectedUnit;
 
@@ -79,12 +80,17 @@ namespace FuckingGame
             }
             return result;
         }
-        public List<Unit> GenerateUnits()
+        public List<Unit> GenerateUnits() // подумать над тем, как будут добавляться юниты
         {
             List<Unit> result = new List<Unit>();
             result.Add(new Swordsman(1,player1, 100, 50, 3, 2,XSize,YSize));
-            result.Add(new Swordsman(3,player1, 100, 50,0,0,XSize,YSize));
-            result.Add(new Swordsman(2,player2, 100, 50, 1, 1,XSize,YSize));
+            result.Add(new Swordsman(2,player1, 100, 50,0,0,XSize,YSize));
+            result.Add(new Swordsman(3,player2, 50, 50, 1, 1,XSize,YSize));
+            result.Add(new Swordsman(4,player2,100,50,2,2,XSize,YSize));
+            player1.OwnedUnits.Add(result[0]);
+            player1.OwnedUnits.Add(result[1]);
+            player2.OwnedUnits.Add(result[2]);
+            player2.OwnedUnits.Add(result[3]);
             return result;
         }
         private void RenderMap(IReadOnlyList<Tile> map)
@@ -104,7 +110,7 @@ namespace FuckingGame
                 rect.Width = tile.XSize; 
                 rect.Height = tile.YSize;
                 rect.Stretch = Stretch.Uniform;
-                rect.MouseUp += new MouseButtonEventHandler(MouseBtn);
+                //rect.MouseUp += new MouseButtonEventHandler(MouseBtn);
 
                 switch (tile)
                 {
@@ -133,7 +139,7 @@ namespace FuckingGame
                 }
             }
         }
-        private void RenderUnits(IReadOnlyList<Unit> units)
+        private void RenderUnits(IReadOnlyList<Unit> units) // Возможно создам кастомный шаблон
         {
             foreach (Unit unit in units)
             {
@@ -141,14 +147,20 @@ namespace FuckingGame
                 un.Width = unit.XSize;
                 un.Height = unit.YSize;
                 un.Stretch = Stretch.Uniform;
-                if (unit.Player == player2)
+                if (unit.Player == player2 && unit.isDead == false)
                 {
                     unit.source = new BitmapImage(new Uri("ASSets/Swordsman_enemy.png", UriKind.Relative));
                 } 
                 un.Source = unit.source;
                 un.MouseUp += new MouseButtonEventHandler(MouseBtn1);
                 CanvasMap.Children.Add(un);
-                Canvas.SetZIndex(un, 2);
+                if (unit.isDead == true)
+                {
+                    Canvas.SetZIndex(un, 1);
+                } else
+                {
+                    Canvas.SetZIndex(un, 2);
+                }
                 Canvas.SetLeft(un, (unit.X * unit.XSize));
                 Canvas.SetTop(un, (unit.Y * unit.YSize));
             }
@@ -156,27 +168,27 @@ namespace FuckingGame
         private void MouseBtn(object sender, MouseEventArgs e)
         {
             Point pnt = new Point(Canvas.GetLeft(sender as FrameworkElement),Canvas.GetTop(sender as FrameworkElement));
-            MessageBox.Show($"MousePos: {pnt.X},{pnt.Y}; Coord?: {Math.Ceiling(pnt.X/XSize)},{Math.Ceiling(pnt.Y/YSize)}");
             int XMove = Convert.ToInt32(Math.Ceiling(pnt.X / XSize));
             int YMove = Convert.ToInt32(Math.Ceiling(pnt.Y / YSize));
-            if (savedSelectedUnit != null) // Логика перемещений тоже почти готова, инкапсулировать и доделать потом
-            {
-                controller.MoveUnit(savedSelectedUnit,XMove,YMove);
-                CanvasMap.Children.Clear();
-                RenderMap(controller._map.Tiles);
-                RenderUnits(controller._map.Units);
-            }
+            
+            MoveUnit(XMove, YMove);
         }
         private void MouseBtn1(object sender, MouseEventArgs e)
         {
             Point pnt = new Point(Canvas.GetLeft(sender as FrameworkElement),Canvas.GetTop(sender as FrameworkElement));
             selectedUnit = controller._map.Units.Where(x => x.X == (pnt.X / XSize) && x.Y == (pnt.Y / YSize) && x.isDead == false).FirstOrDefault();
-            
+
             if (savedSelectedUnit == null && selectedUnit.Player == currentMove) // Логика почти готова, позже инкапсулировать ее в каком-нибудь классе
             {
                 savedSelectedUnit = selectedUnit;
+
+                CreateHighlight(savedSelectedUnit,player1,player2,(int)pnt.X, (int)pnt.Y);
+                
                 MessageBox.Show($"CellPos: {pnt.X},{pnt.Y}; UnitPos: {Math.Ceiling(pnt.X / XSize)},{Math.Ceiling(pnt.Y / YSize)}\n" +
                 $"SavedSelected unit: {savedSelectedUnit.Id},{savedSelectedUnit.GetType().Name},Who owns: {savedSelectedUnit.Player.Name}");
+            } else if (savedSelectedUnit != null && selectedUnit == null)
+            {
+                MoveUnit((int)(pnt.X / XSize), (int)(pnt.Y / YSize));
             }
             else if (savedSelectedUnit == null)
             {
@@ -184,18 +196,135 @@ namespace FuckingGame
             } else if (savedSelectedUnit.Player == selectedUnit.Player) 
             {
                 savedSelectedUnit = selectedUnit;
+
+                CanvasMap.Children.Clear();
+                RenderMap(controller._map.Tiles);
+                RenderUnits(controller._map.Units);
+                CreateHighlight(savedSelectedUnit, player1, player2, (int)pnt.X, (int)pnt.Y);
+
                 MessageBox.Show($"New savedSelectedUnit: {savedSelectedUnit.Id},{savedSelectedUnit.GetType().Name},Who owns: {savedSelectedUnit.Player.Name}");
             } else if (selectedUnit.Player != savedSelectedUnit.Player) 
             {
                 bool can = controller.CanAttackUnit(savedSelectedUnit, selectedUnit);
 
                 MessageBox.Show("Данного юнита можно попытаться атаковать\n"+
-                    $"Атакуемый Unit: {selectedUnit.GetType().Name}, Who owns: {selectedUnit.Player.Name}, CanAttack?: {can}");
+                    $"Атакуемый Unit: {selectedUnit.GetType().Name}, Who owns: {selectedUnit.Player.Name}, CanAttack?: {can}, HP Before Attack: {selectedUnit.hp}");
+                if (can)
+                {
+                    controller.AttackUnit(savedSelectedUnit, selectedUnit);
+                    MessageBox.Show("Атака произошла\n" +
+                     $"Атакуемый Unit: {selectedUnit.GetType().Name}, Who owns: {selectedUnit.Player.Name}, CanAttack?: {can}, HP After Attack: {selectedUnit.hp}");                    
+                    EndTurn();
+                }
             }
-            //if (selectedUnit != null)
-            //{
-            //    
-            //}
+        }
+
+        private void CreateHighlight(Unit unit,Player _player1,Player _player2,int X,int Y) // создает подсветку для тайлов
+        {
+
+            Rectangle rect = new Rectangle() // Индивидуальная подсветка для выбранного юнита
+            {
+                Width = XSize,
+                Height = YSize,
+                Fill = Brushes.White,
+                Opacity = 0.6,
+            };
+            CanvasMap.Children.Add(rect);
+            Canvas.SetZIndex(rect, 1);
+            Canvas.SetLeft(rect, X);
+            Canvas.SetTop(rect, Y);
+            
+            foreach (Tile tile in controller._map.Tiles)
+            {
+                if (tile is not Water)
+                {
+                    if (controller.CanMoveUnit(unit, tile.X, tile.Y))
+                    {
+                        rect = new Rectangle()
+                        {
+                            Width = XSize,
+                            Height = YSize,
+                            Fill = Brushes.BlueViolet,
+                            Opacity = 0.3
+                        };
+                        rect.MouseUp += new MouseButtonEventHandler(MouseBtn1);
+                        CanvasMap.Children.Add(rect);
+                        Canvas.SetZIndex(rect, 1);
+                        Canvas.SetLeft(rect, tile.X * tile.XSize);
+                        Canvas.SetTop(rect, tile.Y * tile.YSize);
+                    }
+                }
+            }
+            CreateUnitHighlight(_player1, unit);
+            CreateUnitHighlight(_player2, unit);
+        }
+
+        private void CreateUnitHighlight(Player player, Unit unit)
+        {
+            Rectangle rect = new Rectangle();
+            foreach (Unit collision in player.OwnedUnits)
+            {
+                if (unit.Player == player && unit != collision)
+                {
+                    rect = new Rectangle()
+                    {
+                        Width = XSize,
+                        Height = YSize,
+                        Fill = Brushes.Green,
+                        Opacity = 0.3
+                    };
+                    rect.MouseUp += new MouseButtonEventHandler(MouseBtn1);
+                    CanvasMap.Children.Add(rect);
+                    Canvas.SetZIndex(rect, 1);
+                    Canvas.SetLeft(rect, collision.X * collision.XSize);
+                    Canvas.SetTop(rect, collision.Y * collision.YSize);
+                }
+                else if (unit != collision)
+                {
+                    rect = new Rectangle()
+                    {
+                        Width = XSize,
+                        Height = YSize,
+                        Fill = Brushes.Red,
+                        Opacity = 0.3
+                    };
+                    rect.MouseUp += new MouseButtonEventHandler(MouseBtn1);
+                    CanvasMap.Children.Add(rect);
+                    Canvas.SetZIndex(rect, 1);
+                    Canvas.SetLeft(rect, collision.X * collision.XSize);
+                    Canvas.SetTop(rect, collision.Y * collision.YSize);
+                }
+            }
+        } // Создает подсветку конкретного юнита
+        private void MoveUnit(int XMove,int YMove)
+        {
+            if (savedSelectedUnit != null)
+            {
+                if (controller.CanMoveUnit(savedSelectedUnit, XMove, YMove))
+                {
+                    controller.MoveUnit(savedSelectedUnit, XMove, YMove);
+                    EndTurn();
+                }
+            }
+        }
+        
+        private void EndTurn()
+        {
+            currentMove = controller.ChangeMove(player1, player2);
+            if (currentMove.OwnedUnits.Where(x => x.isDead == false).FirstOrDefault() != null)
+            {
+                savedSelectedUnit = null;
+                StatusText.Text = player1.Status;
+                StatusText1.Text = player2.Status;
+                CanvasMap.Children.Clear();
+                RenderMap(controller._map.Tiles);
+                RenderUnits(controller._map.Units);
+            } else
+            {
+                MessageBox.Show($"Игрок {currentMove.Name} потерял всех юнитов, игра окончена!");
+                Application.Current.Shutdown();
+            }
+
         }
 
         private void Map_Loaded(object sender, RoutedEventArgs e)

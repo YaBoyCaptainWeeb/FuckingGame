@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="ASSets\dead.png" />
     <None Remove="ASSets\Grass.png" />
     <None Remove="ASSets\knight_image.png" />
     <None Remove="ASSets\Mountain-Dusk.png" />
@@ -20,6 +21,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="ASSets\dead.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="ASSets\Player1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
