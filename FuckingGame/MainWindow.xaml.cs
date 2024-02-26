@@ -253,7 +253,7 @@ namespace FuckingGame
             
             foreach (Tile tile in controller._map.Tiles)
             {
-                if (tile is not Water)
+                if (tile.IsWalkable)
                 {
                     if (controller.CanMoveUnit(unit, tile.X, tile.Y))
                     {
