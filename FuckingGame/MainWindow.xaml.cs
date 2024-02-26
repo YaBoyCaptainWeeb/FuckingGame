@@ -12,6 +12,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml.Linq;
 using Strategy.Domain;
+using Strategy.Domain.Factories;
 using Strategy.Domain.Models;
 
 
@@ -82,20 +83,38 @@ namespace FuckingGame
         }
         public List<Unit> GenerateUnits() // подумать над тем, как будут добавляться юниты
         {
+            UnitFactory meleeFactory = new MeleeUnitFactory();
+            UnitFactory rangedFactory = new RangedUnitFactory();
             List<Unit> result = new List<Unit>();
-            result.Add(new Swordsman(1,player1, 100, 50, 5, 6,XSize,YSize));
-            result.Add(new Swordsman(2,player1, 100, 50,5,7,XSize,YSize));
-            result.Add(new Swordsman(3,player2, 100, 50, 15, 6,XSize,YSize));
-            result.Add(new Swordsman(4,player2,100,50,15,7,XSize,YSize));
+            result.Add(meleeFactory.CreateUnit("swordsman", player1, controller._map, 5, 6, XSize, YSize));
+            result.Add(meleeFactory.CreateUnit("swordsman", player1, controller._map, 5, 7, XSize, YSize));
+            result.Add(meleeFactory.CreateUnit("swordsman", player2, controller._map, 15, 6, XSize, YSize));
+            result.Add(meleeFactory.CreateUnit("swordsman", player2, controller._map, 15, 7, XSize, YSize));
 
-            result.Add(new Archer(5, player1, 50, 50, 6, 6, XSize, YSize));
-            result.Add(new Archer(6, player2, 50, 50,14,6,XSize,YSize));
+            result.Add(rangedFactory.CreateUnit("archer",player1,controller._map,6,6,XSize,YSize));
+            result.Add(rangedFactory.CreateUnit("archer", player2, controller._map, 14, 6, XSize, YSize));
 
-            result.Add(new Horseman(7,player1,200,75,5,5,XSize,YSize));
-            result.Add(new Horseman(8,player2,200,75,15,5,XSize,YSize));
+            result.Add(meleeFactory.CreateUnit("horseman", player1, controller._map, 5,5, XSize, YSize));
+            result.Add(meleeFactory.CreateUnit("horseman", player2, controller._map, 15,5, XSize, YSize));
 
-            result.Add(new Catapult(9,player1,75,100,4,6,XSize,YSize));
-            result.Add(new Catapult(10,player2,75,100,16,6,XSize,YSize));
+            result.Add(rangedFactory.CreateUnit("catapult", player1, controller._map, 4, 6, XSize, YSize));
+            result.Add(rangedFactory.CreateUnit("catapult", player2, controller._map, 16, 6, XSize, YSize));
+
+
+
+            //result.Add(new Swordsman(1,player1, 100, 50, 5, 6,XSize,YSize));
+            //result.Add(new Swordsman(2,player1, 100, 50,5,7,XSize,YSize));
+            //result.Add(new Swordsman(3,player2, 100, 50, 15, 6,XSize,YSize));
+            //result.Add(new Swordsman(4,player2,100,50,15,7,XSize,YSize));
+
+            //result.Add(new Archer(5, player1, 50, 50, 6, 6, XSize, YSize));
+            //result.Add(new Archer(6, player2, 50, 50,14,6,XSize,YSize));
+
+            //result.Add(new Horseman(7,player1,200,75,5,5,XSize,YSize));
+            //result.Add(new Horseman(8,player2,200,75,15,5,XSize,YSize));
+
+            //result.Add(new Catapult(9,player1,75,100,4,6,XSize,YSize));
+            //result.Add(new Catapult(10,player2,75,100,16,6,XSize,YSize));
             player1.OwnedUnits.Add(result[0]);
             player1.OwnedUnits.Add(result[1]);
             player1.OwnedUnits.Add(result[4]);
@@ -334,6 +353,8 @@ namespace FuckingGame
                 StatusText.Text = player1.Status;
                 StatusText1.Text = player2.Status;
                 CanvasMap.Children.Clear();
+                controller._map.WeatherChanged();
+                WeatherBroadCast.Text = controller._map.Weather;
                 RenderMap(controller._map.Tiles);
                 RenderUnits(controller._map.Units);
             } else
@@ -346,7 +367,12 @@ namespace FuckingGame
 
         private void Map_Loaded(object sender, RoutedEventArgs e)
         {
-            controller = new GameController(new Map(GenerateTiles(_map, XSize, YSize),GenerateUnits()));
+            controller = new GameController();
+            Map map = new Map();
+            controller._map = map;
+
+            controller._map.Tiles = GenerateTiles(_map,XSize,YSize);
+            controller._map.Units = GenerateUnits();
             currentMove = player1;
 
             vm.player1 = player1;
